@@ -1,0 +1,35 @@
+name: Test Self-Hosted Runner
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:  # 수동 실행 가능
+
+jobs:
+  test:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Print system info
+        run: |
+          echo "Runner 정보"
+          echo "Hostname: $(hostname)"
+          echo "OS: $(uname -a)"
+          echo "CPU: $(nproc) cores"
+          echo "Memory: $(free -h | grep Mem | awk '{print $2}')"
+          echo "Disk: $(df -h / | tail -1 | awk '{print $4}') available"
+
+      - name: Check Java version
+        run: java -version
+
+      - name: Check Docker version
+        run: docker --version
+
+      - name: List files
+        run: |
+          echo "Working directory:"
+          pwd
+          ls -la
