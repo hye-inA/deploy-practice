@@ -6,30 +6,25 @@ on:
   workflow_dispatch:  # 수동 실행 가능
 
 jobs:
-  test:
+  build:
     runs-on: self-hosted
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Print system info
-        run: |
-          echo "Runner 정보"
-          echo "Hostname: $(hostname)"
-          echo "OS: $(uname -a)"
-          echo "CPU: $(nproc) cores"
-          echo "Memory: $(free -h | grep Mem | awk '{print $2}')"
-          echo "Disk: $(df -h / | tail -1 | awk '{print $4}') available"
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: gradle
 
-      - name: Check Java version
-        run: java -version
+      - name: Grant execute permission
+        run: chmod +x ./gradlew
 
-      - name: Check Docker version
-        run: docker --version
+      - name: Build with Gradle
+        run: ./gradlew clean build -x test
 
-      - name: List files
-        run: |
-          echo "Working directory:"
-          pwd
-          ls -la
+      - name: Run tests
+        run: ./gradlew test
